@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Putting Coal to Sleep in the Waterbed: Empirical EU ETS Price Reactions to Coal Phase-Outs
  
  Welcome to my dissertation's machine room. It is not necessarily perfectly tidy, but the engine runs smoothly. 
@@ -13,4 +12,4 @@
 
  Best,
  32550
-=======
+========================
