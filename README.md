@@ -1,2 +1,2 @@
-# Diss_CPOs_EU_ETS
- 
+Putting Coal to Sleep in the Waterbed: 
+Empirical EU ETS Price Reactions to Coal Phase-Outs
