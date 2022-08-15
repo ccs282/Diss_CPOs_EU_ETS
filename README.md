@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Diss_CPOs_EU_ETS
  
  Welcome to my dissertation's machine room. It is not necessarily perfectly tidy, but the engine runs smoothly. 
@@ -12,3 +13,7 @@
 
  Best,
  32550
+=======
+Putting Coal to Sleep in the Waterbed: 
+Empirical EU ETS Price Reactions to Coal Phase-Outs
+>>>>>>> defa6cd140f68b770cd3a048ff84940755abb7d0
