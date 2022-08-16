@@ -342,76 +342,11 @@ if volume == "yes" {
 						if _rc == 0 {
 							capture drop NR_`x'_`y'`i'
 
-							* Constant Mean (volume)
-							if reg_type == 1 {
-								reg ln_return_eua_vol est_win_`x'_`y'`i' if est_win_`x'_`y'`i' == 1, robust noconst
-								gen NR_`x'_`y'`i' = e(b)[1, 1]
-								scalar df_`x'_`y'`i' = e(df_r)
-								scalar num_par_`x'_`y'`i' = e(N) - e(df_r)
-							}
-
 							if reg_type == 1.1 {
 								reg ln_eua_vol_mon est_win_`x'_`y'`i' if est_win_`x'_`y'`i' == 1, robust noconst
 								gen NR_`x'_`y'`i' = e(b)[1, 1]
 								scalar df_`x'_`y'`i' = e(df_r)
 								scalar num_par_`x'_`y'`i' = e(N) - e(df_r)
-							}
-
-							* Zero Mean (volume)
-							else if reg_type == 2 {
-								gen NR_`x'_`y'`i' = 0
-								reg ln_return_eua_vol est_win_`x'_`y'`i' if est_win_`x'_`y'`i' == 1, robust noconst
-								scalar df_`x'_`y'`i' = e(N)
-								scalar num_par_`x'_`y'`i' = 0
-							}
-
-							* Koch et al. (2016) variables model (volume)
-							else if reg_type == 3 {
-								reg ln_return_eua_vol L.ln_return_eua_vol $D_ln_return_explanatory_2 if est_win_`x'_`y'`i' == 1, robust
-								scalar df_`x'_`y'`i' = e(df_r)
-								scalar num_par_`x'_`y'`i' = e(N) - e(df_r)
-
-								predict NR_`x'_`y'`i' if est_win_`x'_`y'`i' == 1
-
-								summ trading_date if event_date_`x'_`y'`i' == 1
-								capture drop tempv = . 
-								gen tempv = ln_return_eua_vol if trading_date < (r(mean) - event_length_pre) // create a temporary variable for the recursive estimation (bc. of the lagged dependent variable)
-
-								reg tempv L.tempv $D_ln_return_explanatory_2 if est_win_`x'_`y'`i' == 1, robust
-					
-								local ew_length = event_length_post + event_length_pre + 1
-								forvalues j = 1(1)`ew_length' {
-									summ trading_date if event_date_`x'_`y'`i' == 1
-									predict NR_`x'_`y'`i'_`j' if trading_date == (r(mean) - event_length_pre -1 + `j')
-									replace tempv = NR_`x'_`y'`i'_`j' if trading_date == (r(mean) - event_length_pre -1 + `j')
-									replace NR_`x'_`y'`i' = NR_`x'_`y'`i'_`j' if trading_date == (r(mean) - event_length_pre -1 + `j')
-								}
-
-								drop NR_`x'_`y'`i'_* tempv
-							}
-
-							else if reg_type == 3.1 { // (volume)
-								reg ln_return_eua_vol L.ln_return_eua_vol $ln_return_explanatory if est_win_`x'_`y'`i' == 1, robust
-								scalar df_`x'_`y'`i' = e(df_r)
-								scalar num_par_`x'_`y'`i' = e(N) - e(df_r)
-
-								predict NR_`x'_`y'`i' if est_win_`x'_`y'`i' == 1
-
-								summ trading_date if event_date_`x'_`y'`i' == 1
-								capture drop tempv = . 
-								gen tempv = ln_return_eua_vol if trading_date < (r(mean) - event_length_pre) // create a temporary variable for the recursive estimation (bc. of the lagged dependent variable)
-
-								reg tempv L.tempv $ln_return_explanatory if est_win_`x'_`y'`i' == 1, robust
-					
-								local ew_length = event_length_post + event_length_pre + 1
-								forvalues j = 1(1)`ew_length' {
-									summ trading_date if event_date_`x'_`y'`i' == 1
-									predict NR_`x'_`y'`i'_`j' if trading_date == (r(mean) - event_length_pre -1 + `j')
-									replace tempv = NR_`x'_`y'`i'_`j' if trading_date == (r(mean) - event_length_pre -1 + `j')
-									replace NR_`x'_`y'`i' = NR_`x'_`y'`i'_`j' if trading_date == (r(mean) - event_length_pre -1 + `j')
-								}
-
-								drop NR_`x'_`y'`i'_* tempv
 							}
 						}
 					}
