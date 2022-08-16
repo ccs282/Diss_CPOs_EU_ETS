@@ -46,12 +46,14 @@
 	
 *** explained/dependent variable
 
-	capture drop eua eua_vol
+	capture drop eua eua_vol1 eua_vol2
 
 	gen eua = .
-	gen eua_vol = .
-	
-	forvalues i = 7(1)22 { // generate eua variable 
+	gen eua1 = .
+	gen eua_vol1 = .
+	gen eua_vol2 = .
+
+	forvalues i = 7(1)22 { // generate eua variable; rolling over to next year's maturity as late as possible (mid-December)
 		if `i' < 10 {
 			replace eua = eua0`i' if eua == . & eua0`i' != .
 		}
@@ -62,28 +64,67 @@
 
 	order eua, after(date)
 
-	forvalues i = 7(1)22 { // generate eua volume variable
-		if `i' < 10 {
-			replace eua_vol = eua200`i'_vol if eua_vol == . & eua200`i'_vol != .
-		}
-		else {
-			replace eua_vol = eua20`i'_vol if eua_vol == . & eua20`i'_vol != .
-		}
-	}
+	** for volume analysis
 
-	** volume monetised
-		capture drop eua_vol_mon
-		gen eua_vol_mon = .
-		replace eua_vol_mon = eua_vol*1000*eua
 
-		capture drop ln_eua_vol_mon
-		gen ln_eua_vol_mon = .
-		replace ln_eua_vol_mon = ln(eua_vol_mon)
+		forvalues i = 7(1)22 { // generate eua volume variable 1; rolling over to next year's maturity at the end of September
+			if `i' < 10 {
+				replace eua_vol1 = eua200`i'_vol1 if eua_vol1 == . & eua200`i'_vol1 != .
+			}
+			else {
+				replace eua_vol1 = eua20`i'_vol1 if eua_vol1 == . & eua20`i'_vol1 != .
+			}
+		}
+
+		forvalues i = 7(1)22 { // generate eua volume variable 2; rolling over to next year's maturity as late as possible (mid-December)
+			if `i' < 10 {
+				replace eua_vol2 = eua200`i'_vol2 if eua_vol2 == . & eua200`i'_vol2 != .
+			}
+			else {
+				replace eua_vol2 = eua20`i'_vol2 if eua_vol2 == . & eua20`i'_vol2 != .
+			}
+		}
+
+
+		forvalues i = 7(1)22 { // generate eua variable; rolling over to next year's maturity at the end of September; used for volume analysis (not main analysis)
+			if `i' < 10 {
+				tab date if eua200`i'_vol1 != ., matrow(temp`i')
+				quietly levelsof date if eua200`i'_vol1 != .
+				local no_dates_`i' = r(r)
+				local cut_off_date_`i' = temp`i'[`no_dates_`i'', 1]
+				replace eua1 = eua0`i' if eua1 == . & eua0`i' != . & date <= `cut_off_date_`i''
+			}
+			else {
+				tab date if eua20`i'_vol1 != ., matrow(temp`i')
+				quietly levelsof date if eua20`i'_vol1 != .
+				local no_dates_`i' = r(r)
+				local cut_off_date_`i' = temp`i'[`no_dates_`i'', 1]
+				replace eua1 = eua`i' if eua1 == . & eua`i' != . & date <= `cut_off_date_`i''
+			}
+		}
+
+
+		* volume monetised
+
+			capture drop eua_vol_mon1 // based on the variables rolling over at the end of September
+			gen eua_vol_mon1 = .
+			replace eua_vol_mon1 = eua_vol1*1000*eua1
+
+			capture drop ln_eua_vol_mon1
+			gen ln_eua_vol_mon1 = .
+			replace ln_eua_vol_mon1 = ln(eua_vol_mon1)
+
+			capture drop eua_vol_mon2 // based on the variables rolling over in December
+			gen eua_vol_mon2 = .
+			replace eua_vol_mon2 = eua_vol2*1000*eua
+
+			capture drop ln_eua_vol_mon2
+			gen ln_eua_vol_mon2 = .
+			replace ln_eua_vol_mon2 = ln(eua_vol_mon2)
 
 	save data, replace
 
-
-	global dependent eua eua_vol
+	global dependent eua
 
 	foreach var of global dependent { // log returns eua and eua volume
 		drop if `var' == .
