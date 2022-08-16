@@ -47,7 +47,6 @@
 
             ** Variance & SD AR (estimation win) // volume
 		if test_specific_date == "yes" { // (volume)
-        	summ ln_trad_vol if est_win == 1
             capture drop AR_squared
             capture drop TSS
             gen AR_squared = .
@@ -67,7 +66,6 @@
 					forvalues i = 1(1)10 {
 						capture confirm scalar `x'_`y'`i'_d
 						if _rc == 0 {
-	                    	summ ln_eua_vol_mon if est_win_`x'_`y'`i' == 1
                             capture drop AR_squared
                             capture drop TSS
                             gen AR_squared = .
