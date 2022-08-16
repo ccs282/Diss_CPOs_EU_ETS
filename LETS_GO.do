@@ -35,8 +35,8 @@
 			
 			scalar show_days = 1 // 1: show not only pre / post estimations but also every single day
 			
-			scalar price = "yes" // price event study (default)
-			scalar volume = "n" // volume event study
+			scalar price = "yes" // price event study (default); "yes" is if shall be selected
+			scalar volume = "n" // volume event study; set est_length to 30; not coded for option test_specific_date
 
 	quietly do event_study
 
