@@ -107,7 +107,7 @@
 		}
 
         else {
-			foreach x in bg cz dk fi de el hu it nl pl pt ro sk si es uk xx {
+			foreach x in bg cz dk fi de el hu it nl pl pt ro sk si es uk xx { // corresponds to equation 6
 				foreach y in main alt new rev follow leak canc parl nuc {
 					forvalues i = 1(1)10 {
 						capture confirm scalar `x'_`y'`i'_d
@@ -135,7 +135,7 @@
 
     ** Variance & SD average CAR (event window; across different dates)
 		
-		if test_specific_date != "yes" {
+		if test_specific_date != "yes" { // corresponds to equation 9
             * Pre-event
                 capture drop v_*
 
@@ -255,7 +255,7 @@
         else {
 
 
-			foreach x in bg cz dk fi de el hu it nl pl pt ro sk si es uk xx {
+			foreach x in bg cz dk fi de el hu it nl pl pt ro sk si es uk xx { // corresponds to equation 5
 				foreach y in main alt new rev follow leak canc parl nuc {
 					forvalues i = 1(1)10 {
 						capture confirm scalar `x'_`y'`i'_d
@@ -322,6 +322,7 @@
 
             scalar df_avg = df_avg / No 
 
+                // corresponds to equation 8
                 * Pre-event
                     scalar t_pre_avg = CAR_pre_avg/SD_CAR_pre_avg
                     scalar p_pre_avg = ttail(df_avg ,abs(t_pre_avg))*2

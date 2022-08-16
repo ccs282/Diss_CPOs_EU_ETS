@@ -216,7 +216,7 @@ if price == "yes" { // default price event study
 
 
 							else if reg_type == 3 { // log returns for all variables; MAIN MODEL
-								reg ln_return_eua L.ln_return_eua $ln_return_explanatory if est_win_`x'_`y'`i' == 1, robust
+								reg ln_return_eua L.ln_return_eua $ln_return_explanatory if est_win_`x'_`y'`i' == 1, robust // corresponds to equation 3 in the paper
 								scalar df_`x'_`y'`i' = e(df_r)
 								scalar num_par_`x'_`y'`i' = e(N) - e(df_r)
 
@@ -284,7 +284,7 @@ if price == "yes" { // default price event study
 						capture confirm scalar `x'_`y'`i'_d
 						if _rc == 0 {
 							capture drop AR_`x'_`y'`i'
-							gen AR_`x'_`y'`i' = ln_return_eua - NR_`x'_`y'`i'
+							gen AR_`x'_`y'`i' = ln_return_eua - NR_`x'_`y'`i' // corresponds to equation 2 in the paper
 						}
 					}
 				}
@@ -412,7 +412,7 @@ if volume == "yes" {
 
 		else {
 
-			foreach x in bg cz dk fi de el hu it nl pl pt ro sk si es uk xx {
+			foreach x in bg cz dk fi de el hu it nl pl pt ro sk si es uk xx { // corresponds to equation 4
 				foreach y in main alt new rev follow leak canc parl nuc {
 					forvalues i = 1(1)10 {
 						capture confirm scalar `x'_`y'`i'_d
@@ -474,7 +474,7 @@ if volume == "yes" {
 
 	** Average CAR across dates and countries
 
-		if test_specific_date != "yes" {
+		if test_specific_date != "yes" { // corresponds to equation 7
 
 			scalar No = 0
 			
