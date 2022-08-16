@@ -297,57 +297,29 @@ if volume == "yes" {
 		if test_specific_date == "yes" {
 			capture drop NR
 			
-			summ year if event_date == 1, meanonly
-			capture drop year_temp
-			gen year_temp = .
-			replace year_temp = r(mean)
-
-			summ month if event_date == 1, meanonly
-			capture drop month_temp
-			gen month_temp = .
-			replace month_temp = r(mean)
-
-			if month_temp[1] <= 9 {
-				local year_t = year_temp[1]
-				capture drop trad_vol
-				gen trad_vol = (eua`year_t'_vol*100)/eua`year_t'_out + 0.000255
-				capture drop ln_trad_vol
-				gen ln_trad_vol = ln(trad_vol)
-			}
-
-			else {
-				local year_t = year_temp[1] + 1
-				capture drop trad_vol
-				gen trad_vol = (eua`year_t'_vol*100)/eua`year_t'_out + 0.000255
-				capture drop ln_trad_vol
-				gen ln_trad_vol = ln(trad_vol)
-			}
-
-			capture drop year_temp month_temp
-
-			reg ln_trad_vol est_win if est_win == 1, robust noconst
-			gen NR = e(b)[1, 1]
-			scalar df = e(df_r)
-			scalar num_par = e(N) - e(df_r)
-
-			order NR, after(ln_trad_vol) 
 		}
 
 		else{
-
 			foreach x in bg cz dk fi de el hu it nl pl pt ro sk si es uk xx {
 				foreach y in main alt new rev follow leak canc parl nuc {
 					forvalues i = 1(1)10 {
 						capture confirm scalar `x'_`y'`i'_d
 						if _rc == 0 {
 							capture drop NR_`x'_`y'`i'
+								summ month if event_date_`x'_`y'`i' == 1, meanonly
+								if r(mean) == 9 | r(mean) == 10 | r(mean) == 11 { // use December roll-over for events in September-November to avoid significance bc of different data used (there is a strong threshold effect in the data when rolling over to the next maturity)
+									reg ln_eua_vol_mon2 est_win_`x'_`y'`i' if est_win_`x'_`y'`i' == 1, robust noconst
+									gen NR_`x'_`y'`i' = e(b)[1, 1]
+									scalar df_`x'_`y'`i' = e(df_r)
+									scalar num_par_`x'_`y'`i' = e(N) - e(df_r)
+								}
 
-							if reg_type == 1.1 {
-								reg ln_eua_vol_mon est_win_`x'_`y'`i' if est_win_`x'_`y'`i' == 1, robust noconst
-								gen NR_`x'_`y'`i' = e(b)[1, 1]
-								scalar df_`x'_`y'`i' = e(df_r)
-								scalar num_par_`x'_`y'`i' = e(N) - e(df_r)
-							}
+								else { // use September roll-over otherwise
+									reg ln_eua_vol_mon1 est_win_`x'_`y'`i' if est_win_`x'_`y'`i' == 1, robust noconst
+									gen NR_`x'_`y'`i' = e(b)[1, 1]
+									scalar df_`x'_`y'`i' = e(df_r)
+									scalar num_par_`x'_`y'`i' = e(N) - e(df_r)
+								}
 						}
 					}
 				}
@@ -368,7 +340,15 @@ if volume == "yes" {
 						capture confirm scalar `x'_`y'`i'_d
 						if _rc == 0 {
 							capture drop AR_`x'_`y'`i'
-							gen AR_`x'_`y'`i' = ln_eua_vol_mon - NR_`x'_`y'`i'
+							summ month if event_date_`x'_`y'`i' == 1, meanonly
+							if r(mean) == 9 | r(mean) == 10 | r(mean) == 11 { 
+								gen AR_`x'_`y'`i' = ln_eua_vol_mon2 - NR_`x'_`y'`i'
+
+							}
+
+							else { 
+								gen AR_`x'_`y'`i' = ln_eua_vol_mon1 - NR_`x'_`y'`i'
+							}
 						}
 					}
 				}
