@@ -6,7 +6,7 @@
 
  In the "LETS_GO.do"-file, you can also change the main event study parameters, such as model type, event and estimation window lengths etc. 
 
- Having run the main file, you can separately run the "MSFE.do"-file, which performance the forecasting performance calculations. 
+ Having run the main file, you can separately run the "MSFE.do"-file, which executes the forecasting performance calculations. 
 
  For questions related to the code, feel free to reach out to me via means available to you (through the department, for instance).
 
